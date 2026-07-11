@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kholo Tsebong Consulting – HR & Business Strategy</title>
+  <!-- Google Fonts: Serif for headings, Sans for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ----- RESET & BASE ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fbfaf8;
+      color: #1e293b;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    ul {
+      list-style: none;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+    .section-padding {
+      padding: 80px 0 70px;
+    }
+
+    /* ----- ANIMATIONS ----- */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up {
+      animation: fadeUp 0.8s ease-out forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.3s; opacity: 0; }
+    .delay-3 { animation-delay: 0.5s; opacity: 0; }
+
+    /* ----- TOP BAR (Gold accent) ----- */
+    .top-bar {
+      background: #0b2b4a;
+      color: #e8edf3;
+      font-size: 0.9rem;
+      padding: 6px 0;
+      border-bottom: 3px solid #c9a84c;
+    }
+    .top-bar .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-bar .contact-info span {
+      margin-right: 22px;
+      display: inline-block;
+    }
+    .top-bar .contact-info i {
+      margin-right: 8px;
+      color: #c9a84c;
+    }
+    .top-bar .contact-info a {
+      color: #e8edf3;
+      transition: color 0.2s;
+    }
+    .top-bar .contact-info a:hover {
+      color: #c9a84c;
+    }
+    .top-bar .contact-info .wa-link {
+      color: #25D366;
+      margin-left: 4px;
+      font-size: 1.1rem;
+    }
+    .top-bar .contact-info .wa-link:hover {
+      color: #1ebe5d;
+    }
+    .top-bar .social-icons a {
+      color: #e8edf3;
+      margin-left: 14px;
+      transition: color 0.2s;
+      font-size: 1rem;
+    }
+    .top-bar .social-icons a:hover {
+      color: #c9a84c;
+    }
+
+    /* ----- HEADER / NAV ----- */
+    header {
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+    }
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #0b2b4a;
+      letter-spacing: -0.5px;
+    }
+    .logo span {
+      color: #c9a84c;
+    }
+    .logo .badge {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 600;
+      background: #c9a84c;
+      color: #fff;
+      padding: 2px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      margin-left: 10px;
+      vertical-align: middle;
+      text-transform: uppercase;
+    }
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-menu a {
+      font-weight: 500;
+      color: #1e293b;
+      transition: color 0.2s;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+    .nav-menu a:hover {
+      color: #c9a84c;
+    }
+    .nav-menu .btn-login {
+      background: #0b2b4a;
+      color: #fff;
+      padding: 8px 22px;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .nav-menu .btn-login:hover {
+      background: #1e4a6b;
+      color: #fff;
+      transform: scale(1.02);
+    }
+    .menu-toggle {
+      display: none;
+      font-size: 1.6rem;
+      background: none;
+      border: none;
+      color: #0b2b4a;
+      cursor: pointer;
+    }
+
+    /* ----- HERO (prestige layout) ----- */
+    .hero {
+      background: linear-gradient(145deg, #f6f4f0 0%, #eae7e0 100%);
+      padding: 80px 0 90px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.3);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-content .pre-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #c9a84c;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.4rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #0b2b4a;
+      margin-bottom: 16px;
+    }
+    .hero-content h1 i {
+      color: #c9a84c;
+      margin-right: 10px;
+    }
+    .hero-content p {
+      font-size: 1.2rem;
+      color: #475569;
+      margin-bottom: 36px;
+      max-width: 500px;
+      font-weight: 400;
+    }
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .btn-primary {
+      background: #0b2b4a;
+      color: #fff;
+      padding: 16px 38px;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 8px 24px rgba(11, 43, 74, 0.15);
+    }
+    .btn-primary:hover {
+      background: #1e4a6b;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(11, 43, 74, 0.25);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #0b2b4a;
+      padding: 16px 38px;
+      border-radius: 50px;
+      font-weight: 600;
+      border: 2px solid #c9a84c;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn-secondary:hover {
+      background: #c9a84c;
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+    }
+    .hero-image {
+      background: #ffffffd9;
+      backdrop-filter: blur(4px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+    .hero-image i {
+      font-size: 4.2rem;
+      color: #c9a84c;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .hero-image .expert-badge {
+      display: inline-block;
+      background: #0b2b4a;
+      color: #c9a84c;
+      padding: 6px 20px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero-image p {
+      font-size: 1.05rem;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    /* ----- SECTION TITLES (serif) ----- */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #0b2b4a;
+      text-align: center;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto 48px;
+    }
+
+    /* ----- ABOUT ----- */
+    .about-section {
+      background: #ffffff;
+      border-bottom: 1px solid #e9e5de;
+    }
+    .about-section p {
+      font-size: 1.1rem;
+      color: #334155;
+      max-width: 800px;
+      margin: 0 auto 20px;
+      text-align: center;
+    }
+
+    /* ----- SERVICES CARDS (premium) ----- */
+    .services-section {
+      background: #fbfaf8;
+      border-bottom: 1px solid #e9e5de;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+    }
+    .service-card {
+      background: #ffffff;
+      padding: 32px 24px;
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-align: center;
+      border-top: 6px solid #c9a84c;
+    }
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
+    .service-card i {
+      font-size: 2.8rem;
+      color: #c9a84c;
+      margin-bottom: 18px;
+    }
+    .service-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #0b2b4a;
+      margin-bottom: 12px;
+    }
+    .service-card p {
+      color: #475569;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+    .service-card .btn-sm {
+      background: #0b2b4a;
+      color: #fff;
+      padding: 10px 26px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+    .service-card .btn-sm:hover {
+      background: #1e4a6b;
+      transform: scale(1.04);
+    }
+
+    /* ----- DETAILED SERVICES (dual column) ----- */
+    .hr-details {
+      background: #ffffff;
+      border-bottom: 1px solid #e9e5de;
+      padding: 40px 0 50px;
+      display: none;
+      box-shadow: inset 0 8px 20px rgba(0,0,0,0.02);
+    }
+    .hr-details.open {
+      display: block;
+    }
+    .hr-details .container {
+      max-width: 1000px;
+    }
+    .hr-details h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #0b2b4a;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .hr-details .sub-desc {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 36px;
+      font-size: 1rem;
+    }
+    .hr-details .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .hr-details .detail-col h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #c9a84c;
+      border-bottom: 2px solid #c9a84c;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hr-details .detail-col ul li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1ede8;
+      display: flex;
+      align-items: center;
+      font-size: 0.98rem;
+      color: #1e293b;
+    }
+    .hr-details .detail-col ul li i {
+      color: #c9a84c;
+      margin-right: 14px;
+      width: 20px;
+      font-size: 0.9rem;
+    }
+    .hr-details .close-btn {
+      display: block;
+      margin: 36px auto 0;
+      background: #e9e5de;
+      border: none;
+      padding: 12px 36px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 0.95rem;
+    }
+    .hr-details .close-btn:hover {
+      background: #d5cec4;
+    }
+
+    /* ----- MISSION (blockquote) ----- */
+    .mission-section {
+      background: #ffffff;
+      border-bottom: 1px solid #e9e5de;
+    }
+    .mission-section blockquote {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: #0b2b4a;
+      max-width: 850px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 20px 30px;
+      border-left: 8px solid #c9a84c;
+      background: #fbfaf8;
+      border-radius: 0 16px 16px 0;
+    }
+
+    /* ----- WHY CHOOSE US ----- */
+    .why-section {
+      background: #fbfaf8;
+      border-bottom: 1px solid #e9e5de;
+    }
+    .why-content {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      font-size: 1.05rem;
+      color: #334155;
+      background: #fff;
+      padding: 40px 48px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+
+    /* ----- TESTIMONIALS ----- */
+    .testimonials-section {
+      background: #ffffff;
+      border-bottom: 1px solid #e9e5de;
+    }
+    .testimonial-card {
+      background: #fbfaf8;
+      padding: 40px 44px;
+      border-radius: 20px;
+      max-width: 750px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+    .testimonial-card p {
+      font-size: 1.15rem;
+      font-style: italic;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+    .testimonial-card .author {
+      font-weight: 700;
+      color: #0b2b4a;
+      font-size: 1.1rem;
+    }
+
+    /* ----- CONTACT (clickable) ----- */
+    .contact-section {
+      background: #fbfaf8;
+      border-bottom: 1px solid #e9e5de;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+    .contact-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #0b2b4a;
+      margin-bottom: 24px;
+    }
+    .contact-info p {
+      color: #475569;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1rem;
+    }
+    .contact-info i {
+      width: 28px;
+      color: #c9a84c;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .contact-info a {
+      color: #0b2b4a;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .contact-info a:hover {
+      color: #c9a84c;
+    }
+    .contact-info .wa-icon {
+      color: #25D366;
+      font-size: 1.4rem;
+      margin-left: 6px;
+    }
+    .contact-info .wa-icon:hover {
+      color: #1ebe5d;
+    }
+    .contact-form label {
+      display: block;
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      color: #0b2b4a;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid #d5cec4;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #fff;
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: none;
+      border-color: #c9a84c;
+      box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.15);
+    }
+    .contact-form textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+    .contact-form .btn-primary {
+      margin-top: 24px;
+      width: auto;
+      padding: 16px 48px;
+    }
+
+    /* ----- FOOTER ----- */
+    footer {
+      background: #0b2b4a;
+      color: #d5cec4;
+      padding: 60px 0 30px;
+      border-top: 4px solid #c9a84c;
+    }
+    footer .container {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    footer h4 {
+      font-family: 'Playfair Display', serif;
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+    }
+    footer a {
+      display: block;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+      font-size: 0.95rem;
+    }
+    footer a:hover {
+      color: #c9a84c;
+    }
+    footer .social-links a {
+      display: inline-block;
+      margin-right: 18px;
+      font-size: 1.3rem;
+      color: #d5cec4;
+    }
+    footer .social-links a:hover {
+      color: #c9a84c;
+    }
+    footer .footer-contact a {
+      display: inline-block;
+      margin-right: 10px;
+    }
+    footer .footer-contact .wa-link {
+      color: #25D366;
+    }
+    footer .footer-contact .wa-link:hover {
+      color: #1ebe5d;
+    }
+    footer .copyright {
+      grid-column: 1 / -1;
+      text-align: center;
+      border-top: 1px solid #1e4a6b;
+      padding-top: 28px;
+      margin-top: 28px;
+      font-size: 0.9rem;
+    }
+
+    /* ----- RESPONSIVE ----- */
+    @media (max-width: 992px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-content p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .hero-buttons {
+        justify-content: center;
+      }
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+      .hr-details .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      footer .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        padding: 28px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        gap: 18px;
+        align-items: flex-start;
+        border-bottom: 3px solid #c9a84c;
+      }
+      .nav-menu.open {
+        display: flex;
+      }
+      .menu-toggle {
+        display: block;
+      }
+      .top-bar .contact-info span {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 4px;
+      }
+      .top-bar .social-icons {
+        margin-top: 4px;
+      }
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+      footer .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-content h1 {
+        font-size: 2.6rem;
+      }
+      .section-title {
+        font-size: 2.1rem;
+      }
+      .contact-info p {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="contact-info">
+        <span>
+          <i class="fas fa-phone-alt"></i>
+          <a href="tel:+26663450591">+266 6345 0591</a>
+          <a href="https://wa.me/26663450591" target="_blank" class="wa-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </span>
+        <span>
+          <i class="fas fa-envelope"></i>
+          <a href="mailto:info@kholotsebong.co.ls">info@kholotsebong.co.ls</a>
+        </span>
+        <span><i class="fas fa-clock"></i> Mon–Fri: 9am–6pm, Sat: 10am–2pm</span>
+      </div>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <div class="logo">
+        Kholo <span>Tsebong</span>
+        <span class="badge">Certified Experts</span>
+      </div>
+      <nav class="nav-menu" id="navMenu">
+        <a href="#about">Home</a>
+        <a href="#services">Services</a>
+        <a href="#mission">Mission</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#contact">Contact</a>
+        <a href="#" class="btn-login">Log In</a>
+      </nav>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-content fade-up delay-1">
+        <div class="pre-title">— Strategy &amp; People First</div>
+        <h1><i class="fas fa-briefcase"></i> Human Resources <br />&amp; Business Growth</h1>
+        <p>Building strong organisational foundations through expert HR practices and forward‑thinking business development.</p>
+        <div class="hero-buttons">
+          <button class="btn-primary" onclick="openServices('hr')"><i class="fas fa-users"></i> HR Services</button>
+          <button class="btn-secondary" onclick="openServices('bd')"><i class="fas fa-chart-line"></i> Business Development</button>
+        </div>
+      </div>
+      <div class="hero-image fade-up delay-2">
+        <div class="expert-badge"><i class="fas fa-building"></i> Strategic HR &amp; Business Advisory</div>
+        <i class="fas fa-handshake"></i>
+        <p>Trusted by Lesotho's leading organisations for strategic HR, training, and technology solutions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section section-padding" id="about">
+    <div class="container">
+      <h2 class="section-title">About Kholo Tsebong</h2>
+      <p>
+        At Kholo Tsebong Consulting, we empower startups and established organisations to thrive through strategic business development anchored in Human Resources Management. As a multidisciplinary consulting firm, we specialise in designing tailored solutions that address the unique challenges of diverse sectors, ensuring sustainable growth and organisational excellence.
+      </p>
+      <p>
+        Our expertise spans HR management, corporate training, ICT services, and retail IT supply — all delivered with a commitment to practical, high‑impact results.
+      </p>
+    </div>
+  </section>
+
+  <!-- SERVICES CARDS -->
+  <section class="services-section section-padding" id="services">
+    <div class="container">
+      <h2 class="section-title">Our Core Services</h2>
+      <p class="section-subtitle">Click any card below to explore our full suite of HR and business development solutions.</p>
+      <div class="services-grid">
+        <div class="service-card">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <h3>Corporate Trainings</h3>
+          <p>Equipping teams with skills to excel in dynamic business environments.</p>
+          <button class="btn-sm" onclick="openServices('hr')">Explore</button>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-laptop"></i>
+          <h3>Retail Sales of Computers</h3>
+          <p>Supplying quality hardware to meet modern business needs.</p>
+          <button class="btn-sm" onclick="openServices('bd')">Explore</button>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-user-cog"></i>
+          <h3>Human Resources Services</h3>
+          <p>Building strong foundations through effective HR practices.</p>
+          <button class="btn-sm" onclick="openServices('hr')">Explore</button>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-microchip"></i>
+          <h3>ICT Services</h3>
+          <p>Reliable technology solutions that enhance efficiency and innovation.</p>
+          <button class="btn-sm" onclick="openServices('bd')">Explore</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAILED SERVICES (dual column, hidden by default) -->
+  <section class="hr-details" id="hrDetails">
+    <div class="container">
+      <h3><i class="fas fa-bullseye" style="color:#c9a84c;"></i> Complete Service Portfolio</h3>
+      <p class="sub-desc">Our integrated approach covers every facet of human capital and organisational growth.</p>
+      <div class="detail-grid">
+        <div class="detail-col">
+          <h4><i class="fas fa-user-tie"></i> HR Services</h4>
+          <ul>
+            <li><i class="fas fa-check-circle"></i> Human Resources Outsourcing</li>
+            <li><i class="fas fa-check-circle"></i> Labour Outsourcing &amp; Staffing</li>
+            <li><i class="fas fa-check-circle"></i> Payroll Outsourcing</li>
+            <li><i class="fas fa-check-circle"></i> Legal Services (Employment Law)</li>
+            <li><i class="fas fa-check-circle"></i> HR Policies, Practices &amp; Procedures</li>
+            <li><i class="fas fa-check-circle"></i> Strategic Human Resource Planning</li>
+            <li><i class="fas fa-check-circle"></i> Performance Management Systems</li>
+            <li><i class="fas fa-check-circle"></i> Reward Management &amp; Compensation</li>
+            <li><i class="fas fa-check-circle"></i> Culture Management &amp; Engagement</li>
+            <li><i class="fas fa-check-circle"></i> HR Administration &amp; Metrics</li>
+          </ul>
+        </div>
+        <div class="detail-col">
+          <h4><i class="fas fa-chart-pie"></i> Business Development</h4>
+          <ul>
+            <li><i class="fas fa-check-circle"></i> Strategic Business Planning</li>
+            <li><i class="fas fa-check-circle"></i> Organisational Change Management</li>
+            <li><i class="fas fa-check-circle"></i> Corporate Training &amp; Development</li>
+            <li><i class="fas fa-check-circle"></i> ICT Consulting &amp; Digital Transformation</li>
+            <li><i class="fas fa-check-circle"></i> Retail IT Supply (Hardware &amp; Software)</li>
+            <li><i class="fas fa-check-circle"></i> Market Analysis &amp; Growth Strategy</li>
+            <li><i class="fas fa-check-circle"></i> Workforce Analytics &amp; Talent Management</li>
+            <li><i class="fas fa-check-circle"></i> Risk Management &amp; Compliance</li>
+            <li><i class="fas fa-check-circle"></i> Operational Efficiency Audits</li>
+            <li><i class="fas fa-check-circle"></i> Executive Coaching &amp; Leadership</li>
+          </ul>
+        </div>
+      </div>
+      <button class="close-btn" onclick="closeServices()"><i class="fas fa-times"></i> Close Details</button>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="mission-section section-padding" id="mission">
+    <div class="container">
+      <h2 class="section-title">Our Mission</h2>
+      <blockquote>
+        “Our mission is to assist our clients in achieving their objectives while operating in an increasingly complex environment, allowing adequate risk management and supporting them through a wide range of personalised services and tailor‑made solutions.”
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE US -->
+  <section class="why-section section-padding">
+    <div class="container">
+      <h2 class="section-title">Why Choose Us</h2>
+      <div class="why-content">
+        <p>
+          When you partner with Kholo Tsebong Consulting, you receive a first‑class training and advisory solution with a focus on practical skills and professional relevance. Our programs are tailored to your specific needs, and our team of consultants brings deep expertise, academic rigour, and a genuine commitment to your success.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section section-padding" id="testimonials">
+    <div class="container">
+      <h2 class="section-title">Testimonials</h2>
+      <div class="testimonial-card">
+        <p>
+          “We contacted Kholo Tsebong because it was time to join the digital world of online Journalism. They provided excellent service; our website is world class, our readership tripled in a week and continues exponential growth. I would recommend Kholo Tsebong for all those who wish to move into the future with technological success.”
+        </p>
+        <div class="author">— Ministry of Communications, Lesotho</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section section-padding" id="contact">
+    <div class="container">
+      <h2 class="section-title">Get in Touch</h2>
+      <p class="section-subtitle">We’re here to help. Reach out via phone, WhatsApp, email, or the form below.</p>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h3>Contact Information</h3>
+          <p><i class="fas fa-map-marker-alt"></i> Maseru, Lesotho</p>
+          <p>
+            <i class="fas fa-phone-alt"></i>
+            <a href="tel:+26663450591">+266 6345 0591</a>
+            <a href="https://wa.me/26663450591" target="_blank" class="wa-icon" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          </p>
+          <p>
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:info@kholotsebong.co.ls">info@kholotsebong.co.ls</a>
+          </p>
+          <p>
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:support@kholotsebong.co.ls">support@kholotsebong.co.ls</a>
+          </p>
+          <p><i class="fas fa-clock"></i> Mon–Fri: 9am – 6pm &nbsp;|&nbsp; Sat: 10am – 2pm</p>
+          <p style="margin-top: 20px; font-weight: 600; color: #0b2b4a;">
+            <i class="fas fa-headset"></i> 24‑Hour Hotline: <a href="tel:+26663450591">+266 6345 0591</a>
+            <a href="https://wa.me/26663450591" target="_blank" class="wa-icon" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          </p>
+        </div>
+        <div class="contact-form">
+          <form>
+            <label for="name">Your Name</label>
+            <input type="text" id="name" placeholder="Full name" />
+            <label for="email">Your Email</label>
+            <input type="email" id="email" placeholder="Email address" />
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" placeholder="Subject" />
+            <label for="message">Your Message</label>
+            <textarea id="message" placeholder="Tell us how we can help..."></textarea>
+            <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div>
+        <h4>Kholo Tsebong Consulting</h4>
+        <p style="font-size:0.95rem; margin-bottom:16px; color: #b5ad9e;">
+          Empowering organisations through HR excellence, training, and technology.
+        </p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <a href="#about">Home</a>
+        <a href="#services">Our Services</a>
+        <a href="#mission">Mission</a>
+        <a href="#contact">Contact</a>
+        <a href="#">Log In</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Company Profile</a>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <div class="footer-contact">
+          <p><i class="fas fa-phone" style="color:#c9a84c; width:20px;"></i> <a href="tel:+26663450591">+266 6345 0591</a> <a href="https://wa.me/26663450591" target="_blank" class="wa-link" style="color:#25D366;"><i class="fab fa-whatsapp"></i></a></p>
+          <p><i class="fas fa-envelope" style="color:#c9a84c; width:20px;"></i> <a href="mailto:info@kholotsebong.co.ls">info@kholotsebong.co.ls</a></p>
+          <p><i class="fas fa-map-marker-alt" style="color:#c9a84c; width:20px;"></i> Maseru, Lesotho</p>
+        </div>
+      </div>
+      <div class="copyright">
+        &copy; 2026 Kholo Tsebong Consulting. All rights reserved. <span style="color:#c9a84c;">✦</span> Built with precision.
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Mobile menu toggle
+    document.getElementById('menuToggle').addEventListener('click', function() {
+      document.getElementById('navMenu').classList.toggle('open');
+    });
+    document.querySelectorAll('#navMenu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.remove('open');
+      });
+    });
+
+    // Open services details and scroll to it
+    function openServices(type) {
+      const details = document.getElementById('hrDetails');
+      details.classList.add('open');
+      setTimeout(() => {
+        details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
+
+    // Close services details
+    function closeServices() {
+      document.getElementById('hrDetails').classList.remove('open');
+    }
+  </script>
+</body>
+</html>
