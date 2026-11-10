@@ -1,10 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-brand-red: #C1272D;
+  --color-brand-grey: #D1D3D4;
+  --color-brand-dark: #1A1A1A;
+  --color-brand-bg: #F8F9FA;
+}
+
 :root {
   font-family: 'DM Sans', sans-serif;
-  color: #17213a;
-  background: #f8f9fa;
+  color: var(--color-brand-dark);
+  background: var(--color-brand-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -13,5 +20,5 @@
   font-weight: 400;
 }
 
-body { min-width: 320px; min-height: 100vh; margin: 0; }
+body { min-width: 320px; min-height: 100vh; margin: 0; color: var(--color-brand-dark); background: var(--color-brand-bg); }
 button, input, textarea, select { font: inherit; }

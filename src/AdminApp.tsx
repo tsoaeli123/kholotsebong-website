@@ -429,7 +429,7 @@ function DashboardPage({ client }: { client: Client }) {
       {error && <InlineNotice message={error} onRetry={() => { setLoading(true); setError(''); void load() }} />}
       <div className="dashboard-stats">
         {[
-          { label: 'Services', value: counts.services, icon: BriefcaseBusiness, path: '/admin/services', color: 'orange' },
+          { label: 'Services', value: counts.services, icon: BriefcaseBusiness, path: '/admin/services', color: 'red' },
           { label: 'Programs', value: counts.programs, icon: GraduationCap, path: '/admin/programs', color: 'blue' },
           { label: 'Insights', value: counts.articles, icon: BookOpen, path: '/admin/articles', color: 'violet' },
           { label: 'Enquiries', value: counts.enquiries, icon: Inbox, path: '/admin/enquiries', color: 'green' },

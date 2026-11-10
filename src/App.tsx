@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ArrowDown,
   ArrowRight,
@@ -151,7 +152,36 @@ const emptySettings: SiteSettings = {
 }
 const currentYear = new Date().getFullYear()
 
-function App() {
+type SitePage = 'home' | 'about' | 'services' | 'training' | 'contact'
+
+const pageCopy: Record<Exclude<SitePage, 'home'>, { eyebrow: string; title: string; emphasis: string; description: string }> = {
+  about: {
+    eyebrow: 'OUR COMPANY',
+    title: 'People. Possibility.',
+    emphasis: 'Progress.',
+    description: 'Meet Kholo Tsebong Consulting and discover the services behind our approach to business growth.',
+  },
+  services: {
+    eyebrow: 'WHAT WE DO',
+    title: 'Solutions for',
+    emphasis: 'better business.',
+    description: 'Four complementary service areas. One place to start the conversation.',
+  },
+  training: {
+    eyebrow: 'BUSINESS TRAINING',
+    title: 'From first idea',
+    emphasis: 'to next level.',
+    description: 'Explore four business development programmes for different stages of the entrepreneurial journey.',
+  },
+  contact: {
+    eyebrow: 'START A CONVERSATION',
+    title: 'Let’s talk about',
+    emphasis: 'what’s next.',
+    description: 'Looking for training, HR support, ICT services or computers? Send us an enquiry.',
+  },
+}
+
+function App({ page }: { page: SitePage }) {
   const [activeSlide, setActiveSlide] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [services, setServices] = useState(serviceDefaults)
@@ -163,6 +193,7 @@ function App() {
   const [contactError, setContactError] = useState(false)
   const [newsletterMessage, setNewsletterMessage] = useState('')
   const reduceMotion = useReducedMotion()
+  const isHome = page === 'home'
 
   useEffect(() => {
     if (reduceMotion) return
@@ -299,10 +330,12 @@ function App() {
         </div>
         <header className="site-header">
           <div className="site-container nav-inner">
-            <a className="brand" href="#home" aria-label="Kholo Tsebong Consulting home">
-              <span className="brand-monogram">KT</span>
-              <span className="brand-name">KHOLO TSEBONG<small>CONSULTING</small></span>
-            </a>
+            <Link className="brand" to="/" aria-label="Kholo Tsebong Consulting home">
+              <span className="brand-lockup">
+                <img src="/logo.png" alt="Kholo Tsebong Logo" className="h-10 w-auto" />
+                <span className="brand-wordmark">Kholo Tsebong Consulting</span>
+              </span>
+            </Link>
             <button
               className="mobile-menu-toggle"
               type="button"
@@ -313,20 +346,21 @@ function App() {
               {menuOpen ? <X size={21} strokeWidth={1.5} /> : <Menu size={21} strokeWidth={1.5} />}
             </button>
             <nav className={menuOpen ? 'primary-nav is-open' : 'primary-nav'} aria-label="Main navigation">
-              <a href="#home" onClick={() => setMenuOpen(false)}>Home</a>
-              <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
-              <a href="#services" onClick={() => setMenuOpen(false)}>Our services</a>
-              <a href="#programs" onClick={() => setMenuOpen(false)}>Training</a>
-              <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
-              <a className="nav-cta" href="#contact" onClick={() => setMenuOpen(false)}>
+              <Link className={page === 'home' ? 'nav-active' : ''} to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+              <Link className={page === 'about' ? 'nav-active' : ''} to="/about" onClick={() => setMenuOpen(false)}>About</Link>
+              <Link className={page === 'services' ? 'nav-active' : ''} to="/services" onClick={() => setMenuOpen(false)}>Our services</Link>
+              <Link className={page === 'training' ? 'nav-active' : ''} to="/training" onClick={() => setMenuOpen(false)}>Training</Link>
+              <Link className={page === 'contact' ? 'nav-active' : ''} to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
+              <Link className="nav-cta" to="/contact" onClick={() => setMenuOpen(false)}>
                 Let’s talk <ArrowUpRight size={15} strokeWidth={1.5} />
-              </a>
+              </Link>
             </nav>
           </div>
         </header>
 
         <main>
-          <section className="hero-section" id="home" aria-label="Welcome to Kholo Tsebong Consulting">
+          {isHome ? (
+            <section className="hero-section" id="home" aria-label="Welcome to Kholo Tsebong Consulting">
             <div className="hero-slides">
               <AnimatePresence mode="sync">
                 <m.div
@@ -367,8 +401,8 @@ function App() {
                   for people and organisations ready to move forward.
                 </p>
                 <div className="hero-actions">
-                  <a className="button button-accent" href="#services">Explore our solutions <ArrowUpRight size={16} strokeWidth={1.5} /></a>
-                  <a className="button button-outline" href="#contact">Request a consultation <ArrowRight size={16} strokeWidth={1.5} /></a>
+                  <Link className="button button-accent" to="/services">Explore our solutions <ArrowUpRight size={16} strokeWidth={1.5} /></Link>
+                  <Link className="button button-outline" to="/contact">Request a consultation <ArrowRight size={16} strokeWidth={1.5} /></Link>
                 </div>
               </m.div>
             </div>
@@ -381,9 +415,18 @@ function App() {
                 <button type="button" aria-label="Next slide" onClick={() => changeSlide(1)}><ChevronRight size={17} strokeWidth={1.5} /></button>
               </div>
             </div>
-          </section>
+            </section>
+          ) : (
+            <section className="inner-page-hero">
+              <div className="site-container">
+                <span className="eyebrow"><span className="eyebrow-dash" /> {pageCopy[page].eyebrow}</span>
+                <h1>{pageCopy[page].title}<br /><em>{pageCopy[page].emphasis}</em></h1>
+                <p>{pageCopy[page].description}</p>
+              </div>
+            </section>
+          )}
 
-          <section className="intro-section section-space" id="introduction">
+          {isHome && <section className="intro-section section-space" id="introduction">
             <div className="site-container intro-layout">
               <div className="intro-heading">
                 <span className="eyebrow"><span className="eyebrow-dash" /> WHO WE HELP</span>
@@ -391,29 +434,29 @@ function App() {
               </div>
               <div className="intro-aside">
                 <p>From your first business idea to your next organisational milestone, we help turn ambitions into practical progress.</p>
-                <a className="text-link" href="#services">See how we can help <ArrowUpRight size={15} strokeWidth={1.5} /></a>
+                <Link className="text-link" to="/services">See how we can help <ArrowUpRight size={15} strokeWidth={1.5} /></Link>
               </div>
             </div>
             <div className="site-container audience-grid">
-              <a className="audience-card" href="#programs">
+              <Link className="audience-card" to="/training">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=85" alt="Entrepreneurs working on a new business idea" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>01 / ENTREPRENEURS</span><h3>Starting a business?</h3><p>Explore practical business development training.</p><b>Explore training <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
-              </a>
-              <a className="audience-card" href="#services">
+              </Link>
+              <Link className="audience-card" to="/services">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1000&q=85" alt="Professionals collaborating as a team" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>02 / ORGANISATIONS</span><h3>Growing your team?</h3><p>Discover human resources and corporate learning.</p><b>Our services <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
-              </a>
-              <a className="audience-card" href="#services">
+              </Link>
+              <Link className="audience-card" to="/services">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=85" alt="Modern business technology workspace" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>03 / BUSINESSES</span><h3>Need technology?</h3><p>ICT support and computer sales for modern work.</p><b>ICT solutions <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
-              </a>
+              </Link>
             </div>
-          </section>
+          </section>}
 
-          <section className="services-section section-space" id="services">
+          {(isHome || page === 'services') && <section className="services-section section-space" id="services">
             <div className="site-container">
               <div className="section-heading-row">
                 <div>
@@ -426,7 +469,7 @@ function App() {
                 {services.slice(0, 4).map((service, index) => {
                   const Icon = iconByName[service.icon] ?? BriefcaseBusiness
                   return (
-                    <a className="service-card" href="#contact" key={service.id}>
+                    <Link className="service-card" to="/contact" key={service.id}>
                       <div className="service-image-wrap">
                         <img loading="lazy" src={service.image_url} alt="" />
                         <span className="service-icon"><Icon size={21} strokeWidth={1.5} /></span>
@@ -437,14 +480,14 @@ function App() {
                         <p>{service.description}</p>
                         <span className="service-link">Explore service <ArrowUpRight size={15} strokeWidth={1.5} /></span>
                       </div>
-                    </a>
+                    </Link>
                   )
                 })}
               </div>
             </div>
-          </section>
+          </section>}
 
-          <section className="about-section section-space" id="about">
+          {(isHome || page === 'about') && <section className="about-section section-space" id="about">
             <div className="about-image">
               <img loading="lazy" src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1400&q=85" alt="People sharing ideas during a business training session" />
               <span className="image-caption">A practical approach to progress</span>
@@ -459,7 +502,7 @@ function App() {
                 <span className="eyebrow eyebrow-light"><span className="eyebrow-dash" /> ABOUT KHOLO TSEBONG</span>
                 <h2>Practical support.<br /><em>Real conversations.</em></h2>
                 <p>{settings.about_text}</p>
-                <a className="button button-outline about-button" href="#contact">Talk with our team <ArrowUpRight size={16} strokeWidth={1.5} /></a>
+                <Link className="button button-outline about-button" to="/contact">Talk with our team <ArrowUpRight size={16} strokeWidth={1.5} /></Link>
               </m.div>
               <div className="values-grid">
                 <article className="value-card"><Handshake size={20} strokeWidth={1.5} /><span>01</span><h3>Understand</h3><p>Start with your goals, challenges and needs.</p></article>
@@ -467,9 +510,9 @@ function App() {
                 <article className="value-card"><ArrowUpRight size={20} strokeWidth={1.5} /><span>03</span><h3>Grow</h3><p>Support progress with practical solutions.</p></article>
               </div>
             </div>
-          </section>
+          </section>}
 
-          <section className="programs-section section-space" id="programs">
+          {(isHome || page === 'training') && <section className="programs-section section-space" id="programs">
             <div className="site-container">
               <div className="programs-heading">
                 <div><span className="eyebrow eyebrow-light"><span className="eyebrow-dash" /> BUSINESS DEVELOPMENT</span><h2>Training for your<br /><em>next big step.</em></h2></div>
@@ -477,27 +520,27 @@ function App() {
               </div>
               <div className="program-grid">
                 {programs.slice(0, 4).map((program, index) => (
-                  <m.a
+                  <m.div
                     className="program-card"
-                    href="#contact"
                     key={program.id}
                     initial={reduceMotion ? false : { opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
+                    <Link className="program-hit-area" to="/contact" aria-label={`Enquire about ${program.code}`} />
                     <span className="program-number">0{index + 1}</span>
                     <span className="program-code">{program.code}</span>
                     <h3>{program.title}</h3>
                     <p>{program.description}</p>
                     <span className="program-arrow"><ArrowUpRight size={18} strokeWidth={1.5} /></span>
-                  </m.a>
+                  </m.div>
                 ))}
               </div>
             </div>
-          </section>
+          </section>}
 
-          <section className="testimonial-section section-space">
+          {isHome && <section className="testimonial-section section-space">
             <div className="site-container testimonial-inner">
               <div className="testimonial-kicker"><span className="eyebrow"><span className="eyebrow-dash" /> CLIENT EXPERIENCE</span><span className="testimonial-count">01 <i>—</i> 01</span></div>
               <div className="testimonial-content">
@@ -507,9 +550,9 @@ function App() {
               </div>
               <div className="testimonial-side-note">A relationship built<br />on meaningful progress.</div>
             </div>
-          </section>
+          </section>}
 
-          {articles.length > 0 && (
+          {isHome && articles.length > 0 && (
             <section className="insights-section section-space" id="insights">
               <div className="site-container">
                 <div className="section-heading-row">
@@ -528,7 +571,7 @@ function App() {
             </section>
           )}
 
-          <section className="contact-section section-space" id="contact">
+          {(isHome || page === 'contact') && <section className="contact-section section-space" id="contact">
             <div className="site-container contact-layout">
               <div className="contact-copy">
                 <span className="eyebrow"><span className="eyebrow-dash" /> START A CONVERSATION</span>
@@ -559,9 +602,9 @@ function App() {
                 )}
               </form>
             </div>
-          </section>
+          </section>}
 
-          <section className="newsletter-band">
+          {isHome && <section className="newsletter-band">
             <div className="newsletter-image" />
             <div className="site-container newsletter-content">
               <div><span className="eyebrow eyebrow-light"><span className="eyebrow-dash" /> NOTES ON GROWTH</span><h2>Good ideas move<br /><em>business forward.</em></h2><p>Occasional updates from Kholo Tsebong Consulting.</p></div>
@@ -572,27 +615,29 @@ function App() {
                 {newsletterMessage && <span className="newsletter-feedback" role="status">{newsletterMessage}</span>}
               </form>
             </div>
-          </section>
+          </section>}
         </main>
 
         <footer className="site-footer">
           <div className="site-container">
             <div className="footer-grid">
               <div className="footer-about">
-                <a className="brand footer-brand" href="#home">
-                  <span className="brand-monogram">KT</span>
-                  <span className="brand-name">KHOLO TSEBONG<small>CONSULTING</small></span>
-                </a>
+                <Link className="brand footer-brand" to="/">
+                  <span className="brand-lockup">
+                    <img src="/logo.png" alt="Kholo Tsebong Logo" className="h-10 w-auto" />
+                    <span className="brand-wordmark">Kholo Tsebong Consulting</span>
+                  </span>
+                </Link>
                 <p>{settings.footer_copy}</p>
               </div>
-              <div className="footer-links"><h3>Explore</h3><a href="#home">Home</a><a href="#about">About</a><a href="#services">Our services</a><a href="#programs">Training</a><a href="#contact">Contact</a></div>
-              <div className="footer-links"><h3>Our services</h3>{services.map((service) => <a href="#services" key={service.id}>{service.title}</a>)}</div>
+              <div className="footer-links"><h3>Explore</h3><Link to="/">Home</Link><Link to="/about">About</Link><Link to="/services">Our services</Link><Link to="/training">Training</Link><Link to="/contact">Contact</Link></div>
+              <div className="footer-links"><h3>Our services</h3>{services.map((service) => <Link to="/services" key={service.id}>{service.title}</Link>)}</div>
               <div className="footer-links"><h3>Let’s connect</h3><span>{settings.address}</span><a href={`tel:${phoneLink}`}>{settings.phone}</a><a href={`mailto:${settings.email}`}>{settings.email}</a><a href="mailto:support@kholotsebong.co.ls">support@kholotsebong.co.ls</a></div>
             </div>
-            <div className="footer-bottom"><span>© {currentYear} Kholo Tsebong Consulting. All rights reserved.</span><a href="/admin">Admin access <Check size={13} strokeWidth={1.5} /></a><span>Designed for a better tomorrow.</span></div>
+            <div className="footer-bottom"><span>© {currentYear} Kholo Tsebong Consulting. All rights reserved.</span><Link to="/admin">Admin access <Check size={13} strokeWidth={1.5} /></Link><span>Designed for a better tomorrow.</span></div>
           </div>
         </footer>
-        <a className="floating-contact" href="#contact" aria-label="Contact Kholo Tsebong"><ArrowUpRight size={19} strokeWidth={1.5} /></a>
+        <Link className="floating-contact" to="/contact" aria-label="Contact Kholo Tsebong"><ArrowUpRight size={19} strokeWidth={1.5} /></Link>
       </div>
     </LazyMotion>
   )
