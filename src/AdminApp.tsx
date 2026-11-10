@@ -267,7 +267,7 @@ function AdminLogin({ client, onAuthError }: { client: Client; onAuthError: (mes
 
   return (
     <div className="admin-screen login-screen">
-      <Link to="/" className="login-home"><span className="admin-monogram">KT</span><span>KHOLO TSEBONG<small>CONSULTING</small></span></Link>
+      <Link to="/" className="login-home"><img className="admin-brand-logo" src="/logo.png" alt="" /><span>KHOLO TSEBONG<small>CONSULTING</small></span></Link>
       <section className="login-card">
         <span className="login-icon"><ShieldCheck size={21} strokeWidth={1.5} /></span>
         <span className="admin-kicker">SECURE ADMINISTRATION</span>
@@ -355,7 +355,7 @@ function AdminConsole({
     <div className="admin-app">
       {sidebarOpen && <button className="sidebar-backdrop" aria-label="Close admin navigation" onClick={() => setSidebarOpen(false)} />}
       <aside className={sidebarOpen ? 'admin-sidebar sidebar-open' : 'admin-sidebar'}>
-        <Link to="/" className="admin-brand"><span className="admin-monogram">KT</span><span>KHOLO TSEBONG<small>CONSULTING</small></span></Link>
+        <Link to="/" className="admin-brand"><img className="admin-brand-logo" src="/logo.png" alt="" /><span>KHOLO TSEBONG<small>CONSULTING</small></span></Link>
         <span className="sidebar-caption">WORKSPACE</span>
         <nav className="sidebar-nav" aria-label="Admin navigation">
           {sidebarItems.map(({ path, label, icon: Icon, exact }) => {

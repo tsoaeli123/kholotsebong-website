@@ -16,6 +16,7 @@
 .login-home > span:last-child { display: grid; gap: 4px; }
 .login-home small { color: #7e8795; font-family: 'DM Sans', sans-serif; font-size: 8px; letter-spacing: .18em; }
 .admin-monogram { display: grid; width: 38px; height: 38px; place-items: center; color: white; background: #1A1A1A; font-family: 'Playfair Display', Georgia, serif; font-size: 15px; letter-spacing: -.06em; }
+.admin-brand-logo { width: 38px; height: 38px; flex: 0 0 auto; object-fit: contain; }
 .login-card { grid-row: 2; padding: 42px 44px; }
 .login-card h1 { font-size: 39px; }
 .login-card > p { margin-bottom: 28px; }

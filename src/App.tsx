@@ -27,8 +27,7 @@ const serviceDefaults: Service[] = [
     title: 'Corporate Training',
     description:
       'Business development and professional learning programmes designed to help individuals and teams build useful capabilities.',
-    image_url:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=85',
+    image_url: '/images/service-training.jpg',
     icon: 'GraduationCap',
     active: true,
     sort_order: 1,
@@ -38,8 +37,7 @@ const serviceDefaults: Service[] = [
     title: 'Human Resources',
     description:
       'Human resources services and people-focused organisational support. Contact our team to discuss the scope of support available for your organisation.',
-    image_url:
-      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85',
+    image_url: '/images/service-hr.jpg',
     icon: 'UsersRound',
     active: true,
     sort_order: 2,
@@ -49,8 +47,7 @@ const serviceDefaults: Service[] = [
     title: 'ICT Services',
     description:
       'Technology services and practical ICT support to help businesses and organisations work more effectively.',
-    image_url:
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=85',
+    image_url: '/images/service-tech.jpg',
     icon: 'Cpu',
     active: true,
     sort_order: 3,
@@ -60,8 +57,7 @@ const serviceDefaults: Service[] = [
     title: 'Computer Sales',
     description:
       'Retail sales of computers and related technology products. Ask us about available products and specifications.',
-    image_url:
-      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=85',
+    image_url: '/images/service-sales.jpg',
     icon: 'Laptop',
     active: true,
     sort_order: 4,
@@ -107,30 +103,28 @@ const programDefaults: Program[] = [
 
 const heroSlides = [
   {
-    image:
-      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=2200&q=90',
-    alt: 'Professionals collaborating around a table',
+    image: '/images/hero-1.jpg',
+    alt: 'Professionals discussing a business development strategy',
     label: 'People & possibility',
   },
   {
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=2200&q=90',
-    alt: 'A team taking part in a business workshop',
+    image: '/images/hero-2.jpg',
+    alt: 'Colleagues reviewing a digital marketing strategy together',
     label: 'Skills for what is next',
   },
   {
-    image:
-      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2200&q=90',
-    alt: 'A contemporary African business workspace',
+    image: '/images/hero-3.jpg',
+    alt: 'A manager reviewing strategy with her team',
     label: 'Ideas into action',
   },
-  {
-    image:
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2200&q=90',
-    alt: 'Technology and tools for modern work',
-    label: 'Technology that works',
-  },
 ]
+
+const serviceImages: Record<string, string> = {
+  'Corporate Training': '/images/service-training.jpg',
+  'Human Resources': '/images/service-hr.jpg',
+  'ICT Services': '/images/service-tech.jpg',
+  'Computer Sales': '/images/service-sales.jpg',
+}
 
 const iconByName: Record<string, LucideIcon> = {
   GraduationCap,
@@ -371,7 +365,7 @@ function App({ page }: { page: SitePage }) {
                   exit={{ opacity: 0 }}
                   transition={{ duration: reduceMotion ? 0 : 1.1 }}
                 >
-                  <img src={heroSlides[activeSlide].image} alt={heroSlides[activeSlide].alt} />
+                  <img className="object-cover" src={heroSlides[activeSlide].image} alt={heroSlides[activeSlide].alt} />
                 </m.div>
               </AnimatePresence>
             </div>
@@ -439,17 +433,17 @@ function App({ page }: { page: SitePage }) {
             </div>
             <div className="site-container audience-grid">
               <Link className="audience-card" to="/training">
-                <img loading="lazy" src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=85" alt="Entrepreneurs working on a new business idea" />
+                <img className="object-cover" loading="lazy" src="/images/service-training.jpg" alt="Entrepreneurs developing business skills" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>01 / ENTREPRENEURS</span><h3>Starting a business?</h3><p>Explore practical business development training.</p><b>Explore training <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
               </Link>
               <Link className="audience-card" to="/services">
-                <img loading="lazy" src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1000&q=85" alt="Professionals collaborating as a team" />
+                <img className="object-cover" loading="lazy" src="/images/about-team.jpg" alt="Professionals working together as a team" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>02 / ORGANISATIONS</span><h3>Growing your team?</h3><p>Discover human resources and corporate learning.</p><b>Our services <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
               </Link>
               <Link className="audience-card" to="/services">
-                <img loading="lazy" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=85" alt="Modern business technology workspace" />
+                <img className="object-cover" loading="lazy" src="/images/service-tech.jpg" alt="Technology support for modern businesses" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>03 / BUSINESSES</span><h3>Need technology?</h3><p>ICT support and computer sales for modern work.</p><b>ICT solutions <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
               </Link>
@@ -471,7 +465,7 @@ function App({ page }: { page: SitePage }) {
                   return (
                     <Link className="service-card" to="/contact" key={service.id}>
                       <div className="service-image-wrap">
-                        <img loading="lazy" src={service.image_url} alt="" />
+                        <img className="object-cover" loading="lazy" src={serviceImages[service.title] ?? service.image_url} alt={`${service.title} services`} />
                         <span className="service-icon"><Icon size={21} strokeWidth={1.5} /></span>
                         <span className="service-index">0{index + 1}</span>
                       </div>
@@ -489,7 +483,7 @@ function App({ page }: { page: SitePage }) {
 
           {(isHome || page === 'about') && <section className="about-section section-space" id="about">
             <div className="about-image">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1400&q=85" alt="People sharing ideas during a business training session" />
+              <img className="object-cover" loading="lazy" src="/images/about-team.jpg" alt="The Kholo Tsebong team working together" />
               <span className="image-caption">A practical approach to progress</span>
             </div>
             <div className="about-copy">
@@ -562,7 +556,7 @@ function App({ page }: { page: SitePage }) {
                 <div className="insights-grid">
                   {articles.slice(0, 3).map((article) => (
                     <article className="insight-card" key={article.id}>
-                      {article.image_url && <img loading="lazy" src={article.image_url} alt="" />}
+                      {article.image_url && <img className="object-cover" loading="lazy" src={article.image_url} alt={article.title} />}
                       <div><span>{article.created_at.slice(0, 10)}</span><h3>{article.title}</h3><p>{article.excerpt}</p><details className="insight-body"><summary>Continue reading</summary><div>{article.body.split(/\n{2,}/).map((paragraph, index) => <p key={`${article.id}-${index}`}>{paragraph}</p>)}</div></details></div>
                     </article>
                   ))}
@@ -605,7 +599,7 @@ function App({ page }: { page: SitePage }) {
           </section>}
 
           {isHome && <section className="newsletter-band">
-            <div className="newsletter-image" />
+            <img className="newsletter-image object-cover" loading="lazy" src="/images/footer-bg.jpg" alt="Maseru, Lesotho" />
             <div className="site-container newsletter-content">
               <div><span className="eyebrow eyebrow-light"><span className="eyebrow-dash" /> NOTES ON GROWTH</span><h2>Good ideas move<br /><em>business forward.</em></h2><p>Occasional updates from Kholo Tsebong Consulting.</p></div>
               <form className="newsletter-form" onSubmit={submitNewsletter}>
