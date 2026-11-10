@@ -200,8 +200,8 @@ function App() {
         return
       }
 
-      if (serviceResult.data?.length) setServices(serviceResult.data)
-      if (programResult.data?.length) setPrograms(programResult.data)
+      if (serviceResult.data) setServices(serviceResult.data)
+      if (programResult.data) setPrograms(programResult.data)
       if (articleResult.data) setArticles(articleResult.data)
       if (settingsResult.data) setSettings(settingsResult.data)
     }
@@ -546,7 +546,7 @@ function App() {
                 <label>Your email<input name="email" type="email" autoComplete="email" required placeholder="you@example.com" /></label>
                 <label>What can we help with?
                   <select name="service" defaultValue="Corporate Training">
-                    {serviceDefaults.map((service) => <option key={service.id}>{service.title}</option>)}
+                    {services.map((service) => <option key={service.id}>{service.title}</option>)}
                     <option>General Enquiry</option>
                   </select>
                 </label>
@@ -586,7 +586,7 @@ function App() {
                 <p>{settings.footer_copy}</p>
               </div>
               <div className="footer-links"><h3>Explore</h3><a href="#home">Home</a><a href="#about">About</a><a href="#services">Our services</a><a href="#programs">Training</a><a href="#contact">Contact</a></div>
-              <div className="footer-links"><h3>Our services</h3>{serviceDefaults.map((service) => <a href="#services" key={service.id}>{service.title}</a>)}</div>
+              <div className="footer-links"><h3>Our services</h3>{services.map((service) => <a href="#services" key={service.id}>{service.title}</a>)}</div>
               <div className="footer-links"><h3>Let’s connect</h3><span>{settings.address}</span><a href={`tel:${phoneLink}`}>{settings.phone}</a><a href={`mailto:${settings.email}`}>{settings.email}</a><a href="mailto:support@kholotsebong.co.ls">support@kholotsebong.co.ls</a></div>
             </div>
             <div className="footer-bottom"><span>© {currentYear} Kholo Tsebong Consulting. All rights reserved.</span><a href="/admin">Admin access <Check size={13} strokeWidth={1.5} /></a><span>Designed for a better tomorrow.</span></div>
