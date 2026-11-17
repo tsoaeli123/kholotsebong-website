@@ -17,8 +17,16 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react'
-import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react'
-import { supabase, type Article, type Program, type Service, type SiteSettings } from './lib/supabase'
+import { LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react'
+import {
+  supabase,
+  type Article,
+  type ClientRecord,
+  type PageImage,
+  type Program,
+  type Service,
+  type SiteSettings,
+} from './lib/supabase'
 import './App.css'
 
 const serviceDefaults: Service[] = [
@@ -27,7 +35,7 @@ const serviceDefaults: Service[] = [
     title: 'Corporate Training',
     description:
       'Business development and professional learning programmes designed to help individuals and teams build useful capabilities.',
-    image_url: '/images/service-training.jpg',
+    image_url: '/images/service-training.webp',
     icon: 'GraduationCap',
     active: true,
     sort_order: 1,
@@ -37,7 +45,7 @@ const serviceDefaults: Service[] = [
     title: 'Human Resources',
     description:
       'Human resources services and people-focused organisational support. Contact our team to discuss the scope of support available for your organisation.',
-    image_url: '/images/service-hr.jpg',
+    image_url: '/images/service-hr.webp',
     icon: 'UsersRound',
     active: true,
     sort_order: 2,
@@ -47,7 +55,7 @@ const serviceDefaults: Service[] = [
     title: 'ICT Services',
     description:
       'Technology services and practical ICT support to help businesses and organisations work more effectively.',
-    image_url: '/images/service-tech.jpg',
+    image_url: '/images/service-tech.webp',
     icon: 'Cpu',
     active: true,
     sort_order: 3,
@@ -57,7 +65,7 @@ const serviceDefaults: Service[] = [
     title: 'Computer Sales',
     description:
       'Retail sales of computers and related technology products. Ask us about available products and specifications.',
-    image_url: '/images/service-sales.jpg',
+    image_url: '/images/service-sales.webp',
     icon: 'Laptop',
     active: true,
     sort_order: 4,
@@ -103,28 +111,49 @@ const programDefaults: Program[] = [
 
 const heroSlides = [
   {
-    image: '/images/hero-1.jpg',
+    image: '/images/hero-1.webp',
+    width: 1200,
+    height: 675,
     alt: 'Professionals discussing a business development strategy',
     label: 'People & possibility',
   },
   {
-    image: '/images/hero-2.jpg',
+    image: '/images/hero-2.webp',
+    width: 1200,
+    height: 675,
     alt: 'Colleagues reviewing a digital marketing strategy together',
     label: 'Skills for what is next',
   },
   {
-    image: '/images/hero-3.jpg',
+    image: '/images/hero-3.webp',
+    width: 1200,
+    height: 800,
     alt: 'A manager reviewing strategy with her team',
     label: 'Ideas into action',
   },
 ]
 
 const serviceImages: Record<string, string> = {
-  'Corporate Training': '/images/service-training.jpg',
-  'Human Resources': '/images/service-hr.jpg',
-  'ICT Services': '/images/service-tech.jpg',
-  'Computer Sales': '/images/service-sales.jpg',
+  'Corporate Training': '/images/service-training.webp',
+  'Human Resources': '/images/service-hr.webp',
+  'ICT Services': '/images/service-tech.webp',
+  'Computer Sales': '/images/service-sales.webp',
 }
+
+const clientDefaults: ClientRecord[] = [
+  'Ministry of Communications',
+  'ASEC Lesotho',
+  'Leaps and Bounces',
+  'Agno',
+  'Tebellong Hospital',
+  'Black Hair Studio',
+  'Roman Catholic Church Lesotho',
+].map((name, index) => ({
+  id: `client-${index + 1}`,
+  name,
+  logo_url: '',
+  sort_order: index + 1,
+}))
 
 const iconByName: Record<string, LucideIcon> = {
   GraduationCap,
@@ -135,7 +164,9 @@ const iconByName: Record<string, LucideIcon> = {
 
 const emptySettings: SiteSettings = {
   id: 'primary',
-  hero_headline: 'Building stronger businesses. Empowering people.',
+  hero_headline: 'Building strong businesses. Empowering employer and employee.',
+  hero_subheadline:
+    'Human Resources Management, Business Development Services, ICT solutions and computer sales for people and organizations ready to move forward.',
   about_text:
     'Kholo Tsebong Consulting brings business development, human resources and technology services together in one place. Our focus is on practical solutions that help individuals, teams and organisations build capability.',
   footer_copy:
@@ -180,6 +211,8 @@ function App({ page }: { page: SitePage }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [services, setServices] = useState(serviceDefaults)
   const [programs, setPrograms] = useState(programDefaults)
+  const [clients, setClients] = useState(clientDefaults)
+  const [siteImages, setSiteImages] = useState<PageImage[]>([])
   const [articles, setArticles] = useState<Article[]>([])
   const [settings, setSettings] = useState(emptySettings)
   const [contentNotice, setContentNotice] = useState('')
@@ -188,15 +221,28 @@ function App({ page }: { page: SitePage }) {
   const [newsletterMessage, setNewsletterMessage] = useState('')
   const reduceMotion = useReducedMotion()
   const isHome = page === 'home'
+  const heroImages = siteImages.filter((image) => image.section === 'hero')
+  const slides = heroImages.length > 0
+    ? heroImages.map((image) => ({
+      image: image.image_url,
+      width: 1200,
+      height: 675,
+      alt: image.alt_text || 'Kholo Tsebong Consulting',
+      label: 'Kholo Tsebong Consulting',
+    }))
+    : heroSlides
+  const displayedSlide = activeSlide % slides.length
+  const servicePageImages = siteImages.filter((image) => image.section === 'services')
+  const aboutPageImage = siteImages.find((image) => image.section === 'about')
 
   useEffect(() => {
     if (reduceMotion) return
     const timer = window.setInterval(
-      () => setActiveSlide((current) => (current + 1) % heroSlides.length),
+      () => setActiveSlide((current) => (current + 1) % slides.length),
       6500,
     )
     return () => window.clearInterval(timer)
-  }, [reduceMotion])
+  }, [reduceMotion, slides.length])
 
   useEffect(() => {
     let active = true
@@ -204,11 +250,13 @@ function App({ page }: { page: SitePage }) {
     async function loadContent() {
       const client = supabase
       if (!client) return
-      const [serviceResult, programResult, articleResult, settingsResult] = await Promise.all([
+      const [serviceResult, programResult, articleResult, settingsResult, clientResult, imageResult] = await Promise.all([
         client.from('services').select('*').eq('active', true).order('sort_order'),
         client.from('programs').select('*').eq('active', true).order('sort_order'),
         client.from('articles').select('*').eq('status', 'published').order('created_at', { ascending: false }),
         client.from('site_settings').select('*').eq('id', 'primary').maybeSingle(),
+        client.from('clients').select('*').order('sort_order'),
+        client.from('page_images').select('*').order('sort_order'),
       ])
 
       const errors = [
@@ -216,6 +264,8 @@ function App({ page }: { page: SitePage }) {
         programResult.error,
         articleResult.error,
         settingsResult.error,
+        clientResult.error,
+        imageResult.error,
       ].filter(Boolean)
 
       if (!active) return
@@ -229,6 +279,8 @@ function App({ page }: { page: SitePage }) {
       if (programResult.data) setPrograms(programResult.data)
       if (articleResult.data) setArticles(articleResult.data)
       if (settingsResult.data) setSettings(settingsResult.data)
+      if (clientResult.data) setClients(clientResult.data)
+      if (imageResult.data) setSiteImages(imageResult.data)
     }
 
     void loadContent()
@@ -298,9 +350,8 @@ function App({ page }: { page: SitePage }) {
   }
 
   const changeSlide = (direction: number) => {
-    setActiveSlide((current) => (current + direction + heroSlides.length) % heroSlides.length)
+    setActiveSlide((current) => (current + direction + slides.length) % slides.length)
   }
-  const headline = settings.hero_headline.split('|')
   const phoneLink = settings.phone.replace(/[^\d+]/g, '')
 
   return (
@@ -356,18 +407,22 @@ function App({ page }: { page: SitePage }) {
           {isHome ? (
             <section className="hero-section" id="home" aria-label="Welcome to Kholo Tsebong Consulting">
             <div className="hero-slides">
-              <AnimatePresence mode="sync">
-                <m.div
-                  key={activeSlide}
-                  className="hero-slide"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: reduceMotion ? 0 : 1.1 }}
-                >
-                  <img className="object-cover" src={heroSlides[activeSlide].image} alt={heroSlides[activeSlide].alt} />
-                </m.div>
-              </AnimatePresence>
+              <m.div
+                key={activeSlide}
+                className="hero-slide"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: reduceMotion ? 0 : 1.1 }}
+              >
+                <img
+                  className="object-cover"
+                  width={slides[displayedSlide].width}
+                  height={slides[displayedSlide].height}
+                  loading={displayedSlide === 0 ? 'eager' : 'lazy'}
+                  src={slides[displayedSlide].image}
+                  alt={slides[displayedSlide].alt}
+                />
+              </m.div>
             </div>
             <div className="hero-shade" />
             <div className="site-container hero-content">
@@ -378,22 +433,8 @@ function App({ page }: { page: SitePage }) {
                 transition={{ duration: 0.7 }}
               >
                 <span className="eyebrow eyebrow-light"><span className="eyebrow-dash" /> KHOLO TSEBONG CONSULTING · LESOTHO</span>
-                <h1>
-                  {headline.length > 1 ? (
-                    <>
-                      {headline[0]} <em>{headline.slice(1).join(' ')}</em>
-                    </>
-                  ) : (
-                    <>
-                      Building stronger <em>businesses.</em>
-                      <br /> Empowering people.
-                    </>
-                  )}
-                </h1>
-                <p>
-                  Practical business training, human resources, ICT solutions and computer sales
-                  for people and organisations ready to move forward.
-                </p>
+                <h1>{settings.hero_headline}</h1>
+                <p>{settings.hero_subheadline}</p>
                 <div className="hero-actions">
                   <Link className="button button-accent" to="/services">Explore our solutions <ArrowUpRight size={16} strokeWidth={1.5} /></Link>
                   <Link className="button button-outline" to="/contact">Request a consultation <ArrowRight size={16} strokeWidth={1.5} /></Link>
@@ -403,8 +444,8 @@ function App({ page }: { page: SitePage }) {
             <div className="hero-bottom">
               <a href="#introduction" className="scroll-cue"><ArrowDown size={15} strokeWidth={1.5} /> Discover Kholo Tsebong</a>
               <div className="hero-controls" aria-label="Hero slideshow controls">
-                <span className="hero-slide-label">{heroSlides[activeSlide].label}</span>
-                <span className="hero-count">0{activeSlide + 1}<i> / </i>0{heroSlides.length}</span>
+                <span className="hero-slide-label">{slides[displayedSlide].label}</span>
+                <span className="hero-count">0{displayedSlide + 1}<i> / </i>0{slides.length}</span>
                 <button type="button" aria-label="Previous slide" onClick={() => changeSlide(-1)}><ChevronLeft size={17} strokeWidth={1.5} /></button>
                 <button type="button" aria-label="Next slide" onClick={() => changeSlide(1)}><ChevronRight size={17} strokeWidth={1.5} /></button>
               </div>
@@ -433,17 +474,17 @@ function App({ page }: { page: SitePage }) {
             </div>
             <div className="site-container audience-grid">
               <Link className="audience-card" to="/training">
-                <img className="object-cover" loading="lazy" src="/images/service-training.jpg" alt="Entrepreneurs developing business skills" />
+                <img className="object-cover" loading="lazy" src="/images/service-training.webp" alt="Entrepreneurs developing business skills" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>01 / ENTREPRENEURS</span><h3>Starting a business?</h3><p>Explore practical business development training.</p><b>Explore training <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
               </Link>
               <Link className="audience-card" to="/services">
-                <img className="object-cover" loading="lazy" src="/images/about-team.jpg" alt="Professionals working together as a team" />
+                <img className="object-cover" loading="lazy" src="/images/about-team.webp" alt="Professionals working together as a team" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>02 / ORGANISATIONS</span><h3>Growing your team?</h3><p>Discover human resources and corporate learning.</p><b>Our services <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
               </Link>
               <Link className="audience-card" to="/services">
-                <img className="object-cover" loading="lazy" src="/images/service-tech.jpg" alt="Technology support for modern businesses" />
+                <img className="object-cover" loading="lazy" src="/images/service-tech.webp" alt="Technology support for modern businesses" />
                 <span className="image-wash" />
                 <div className="audience-content"><span>03 / BUSINESSES</span><h3>Need technology?</h3><p>ICT support and computer sales for modern work.</p><b>ICT solutions <ArrowUpRight size={14} strokeWidth={1.5} /></b></div>
               </Link>
@@ -465,7 +506,7 @@ function App({ page }: { page: SitePage }) {
                   return (
                     <Link className="service-card" to="/contact" key={service.id}>
                       <div className="service-image-wrap">
-                        <img className="object-cover" loading="lazy" src={serviceImages[service.title] ?? service.image_url} alt={`${service.title} services`} />
+                        <img className="object-cover" loading="lazy" src={servicePageImages[index]?.image_url ?? serviceImages[service.title] ?? service.image_url} alt={`${service.title} services`} />
                         <span className="service-icon"><Icon size={21} strokeWidth={1.5} /></span>
                         <span className="service-index">0{index + 1}</span>
                       </div>
@@ -481,9 +522,30 @@ function App({ page }: { page: SitePage }) {
             </div>
           </section>}
 
+          {(isHome || page === 'services') && <section className="clients-section section-space" id="clients">
+            <div className="site-container">
+              <div className="clients-heading">
+                <div>
+                  <span className="eyebrow"><span className="eyebrow-dash" /> TRUSTED PARTNERSHIPS</span>
+                  <h2>Clients we <em>serve.</em></h2>
+                </div>
+                <p>We work alongside organizations and businesses committed to moving forward.</p>
+              </div>
+              <div className="clients-grid">
+                {clients.map((client) => (
+                  <div className="client-card" key={client.id}>
+                    {client.logo_url
+                      ? <img src={client.logo_url} alt={`${client.name} logo`} loading="lazy" />
+                      : <span>{client.name}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>}
+
           {(isHome || page === 'about') && <section className="about-section section-space" id="about">
             <div className="about-image">
-              <img className="object-cover" loading="lazy" src="/images/about-team.jpg" alt="The Kholo Tsebong team working together" />
+              <img className="object-cover" loading="lazy" src={aboutPageImage?.image_url ?? '/images/about-team.webp'} alt={aboutPageImage?.alt_text || 'The Kholo Tsebong team working together'} />
               <span className="image-caption">A practical approach to progress</span>
             </div>
             <div className="about-copy">
@@ -599,7 +661,7 @@ function App({ page }: { page: SitePage }) {
           </section>}
 
           {isHome && <section className="newsletter-band">
-            <img className="newsletter-image object-cover" loading="lazy" src="/images/footer-bg.jpg" alt="Maseru, Lesotho" />
+            <img className="newsletter-image object-cover" loading="lazy" src="/images/footer-bg.webp" alt="Maseru, Lesotho" />
             <div className="site-container newsletter-content">
               <div><span className="eyebrow eyebrow-light"><span className="eyebrow-dash" /> NOTES ON GROWTH</span><h2>Good ideas move<br /><em>business forward.</em></h2><p>Occasional updates from Kholo Tsebong Consulting.</p></div>
               <form className="newsletter-form" onSubmit={submitNewsletter}>

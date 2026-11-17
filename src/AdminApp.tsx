@@ -10,6 +10,7 @@ import {
   CircleCheck,
   FileText,
   GraduationCap,
+  Handshake,
   Image,
   Inbox,
   LayoutDashboard,
@@ -26,12 +27,22 @@ import {
   X,
 } from 'lucide-react'
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js'
-import { supabase, type Article, type Database, type Program, type Service, type SiteSettings } from './lib/supabase'
+import {
+  supabase,
+  type Article,
+  type ClientRecord,
+  type Database,
+  type PageImage,
+  type Program,
+  type Service,
+  type SiteSettings,
+} from './lib/supabase'
 import './AdminApp.css'
 
-type Collection = 'services' | 'programs' | 'articles'
-type CollectionEntry = Service | Program | Article
+type Collection = 'services' | 'programs' | 'articles' | 'clients'
+type CollectionEntry = Service | Program | Article | ClientRecord
 type FormValues = Record<string, string>
+type ImageSection = PageImage['section']
 type EnquiryStatus = 'new' | 'contacted' | 'closed'
 type ToastMessage = { message: string; type: 'success' | 'error' }
 type FieldDefinition = {
@@ -48,7 +59,9 @@ type Client = SupabaseClient<Database>
 
 const settingsDefaults: SiteSettings = {
   id: 'primary',
-  hero_headline: 'Building stronger|businesses. Empowering people.',
+  hero_headline: 'Building strong businesses. Empowering employer and employee.',
+  hero_subheadline:
+    'Human Resources Management, Business Development Services, ICT solutions and computer sales for people and organizations ready to move forward.',
   about_text:
     'Kholo Tsebong Consulting brings business development, human resources and technology services together in one place. Our focus is on practical solutions that help individuals, teams and organisations build capability.',
   footer_copy:
@@ -94,13 +107,24 @@ const collectionInfo: Record<Collection, { title: string; description: string; f
       { name: 'status', label: 'Publication status', type: 'select', required: true, options: ['draft', 'published'] },
     ],
   },
+  clients: {
+    title: 'Clients',
+    description: 'Manage the organizations and businesses featured in the clients section.',
+    fields: [
+      { name: 'name', label: 'Client name', required: true },
+      { name: 'logo_url', label: 'Logo URL', type: 'url', wide: true },
+      { name: 'sort_order', label: 'Display order', type: 'number', required: true },
+    ],
+  },
 }
 
 const sidebarItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { path: '/admin/services', label: 'Services', icon: BriefcaseBusiness },
+  { path: '/admin/clients', label: 'Clients', icon: Handshake },
   { path: '/admin/programs', label: 'Programs', icon: GraduationCap },
   { path: '/admin/articles', label: 'Blog / Insights', icon: FileText },
+  { path: '/admin/site-images', label: 'Site Images', icon: Image },
   { path: '/admin/enquiries', label: 'Enquiries', icon: Inbox },
   { path: '/admin/settings', label: 'Site settings', icon: Settings2 },
 ]
@@ -345,8 +369,10 @@ function AdminConsole({
 
   let content
   if (page === 'services') content = <CollectionManager client={client} collection="services" />
+  else if (page === 'clients') content = <CollectionManager client={client} collection="clients" />
   else if (page === 'programs') content = <CollectionManager client={client} collection="programs" />
   else if (page === 'articles') content = <CollectionManager client={client} collection="articles" />
+  else if (page === 'site-images') content = <SiteImagesPage client={client} />
   else if (page === 'enquiries') content = <EnquiriesPage client={client} />
   else if (page === 'settings') content = <SiteSettingsPage client={client} />
   else content = <DashboardPage client={client} />
@@ -558,7 +584,7 @@ function CollectionManager({ client, collection }: { client: Client; collection:
   }
 
   async function removeEntry(entry: CollectionEntry) {
-    const title = 'title' in entry ? entry.title : 'Untitled item'
+    const title = 'title' in entry ? entry.title : 'name' in entry ? entry.name : 'Untitled item'
     if (!window.confirm(`Delete “${title}”? This action cannot be undone.`)) return
     try {
       await deleteEntry(client, collection, entry.id)
@@ -581,13 +607,14 @@ function CollectionManager({ client, collection }: { client: Client; collection:
     setUploading(true)
     try {
       const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
-      const objectPath = `insights/${Date.now()}-${crypto.randomUUID()}-${safeName}`
+      const objectPath = `${collection}/${Date.now()}-${crypto.randomUUID()}-${safeName}`
       const { error: uploadError } = await client.storage
         .from('consulting-assets')
         .upload(objectPath, file, { cacheControl: '3600', upsert: false })
       if (uploadError) throw uploadError
       const { data } = client.storage.from('consulting-assets').getPublicUrl(objectPath)
-      setForm((current) => ({ ...current, image_url: data.publicUrl }))
+      const imageField = collection === 'clients' ? 'logo_url' : 'image_url'
+      setForm((current) => ({ ...current, [imageField]: data.publicUrl }))
       showToast('Image uploaded successfully.', 'success')
     } catch (uploadError) {
       showToast(messageFromError(uploadError), 'error')
@@ -596,7 +623,7 @@ function CollectionManager({ client, collection }: { client: Client; collection:
     }
   }
 
-  const action = <button className="admin-primary-button" onClick={beginCreate}><Plus size={16} strokeWidth={1.5} /> Add {collection === 'articles' ? 'article' : collection === 'programs' ? 'program' : 'service'}</button>
+  const action = <button className="admin-primary-button" onClick={beginCreate}><Plus size={16} strokeWidth={1.5} /> Add {collection === 'articles' ? 'article' : collection === 'programs' ? 'program' : collection === 'clients' ? 'client' : 'service'}</button>
 
   return (
     <div className="collection-page">
@@ -607,16 +634,16 @@ function CollectionManager({ client, collection }: { client: Client; collection:
         <div className="collection-toolbar"><span>{loading ? 'Loading content…' : `${entries.length} ${entries.length === 1 ? 'item' : 'items'}`}</span><span className="toolbar-note"><ShieldCheck size={14} strokeWidth={1.5} /> Changes publish to your website</span></div>
         <div className="admin-table-wrap">
           <table className="admin-table content-table">
-            <thead><tr><th>{collection === 'programs' ? 'CODE / TITLE' : 'TITLE'}</th><th>{collection === 'articles' ? 'PUBLICATION' : 'DESCRIPTION'}</th><th>STATUS</th><th className="action-heading">ACTIONS</th></tr></thead>
+            <thead><tr><th>{collection === 'programs' ? 'CODE / TITLE' : collection === 'clients' ? 'CLIENT' : 'TITLE'}</th><th>{collection === 'articles' ? 'PUBLICATION' : collection === 'clients' ? 'LOGO' : 'DESCRIPTION'}</th><th>STATUS</th><th className="action-heading">ACTIONS</th></tr></thead>
             <tbody>
               {loading ? <tr><td colSpan={4} className="table-empty"><LoaderCircle className="spin" size={17} strokeWidth={1.5} /> Loading content…</td></tr>
                 : entries.length === 0 ? <tr><td colSpan={4} className="table-empty">Nothing here yet. Add your first item to get started.</td></tr>
                   : entries.map((entry) => (
                     <tr key={entry.id}>
-                      <td><b>{'title' in entry ? entry.title : 'Untitled item'}</b><span>{collection === 'programs' && 'code' in entry ? entry.code : collection === 'articles' && 'slug' in entry ? `/${entry.slug}` : 'description' in entry ? entry.description : ''}</span></td>
-                      <td>{collection === 'articles' && 'created_at' in entry ? formatDate(entry.created_at) : 'description' in entry ? entry.description : ''}</td>
+                      <td><b>{'title' in entry ? entry.title : 'name' in entry ? entry.name : 'Untitled item'}</b><span>{collection === 'programs' && 'code' in entry ? entry.code : collection === 'articles' && 'slug' in entry ? `/${entry.slug}` : 'description' in entry ? entry.description : ''}</span></td>
+                      <td>{collection === 'articles' && 'created_at' in entry ? formatDate(entry.created_at) : collection === 'clients' && 'logo_url' in entry ? entry.logo_url ? <img className="client-logo-thumbnail" src={entry.logo_url} alt="" /> : 'No logo uploaded' : 'description' in entry ? entry.description : ''}</td>
                       <td><StatusBadge status={'active' in entry ? entry.active ? 'published' : 'hidden' : 'status' in entry ? entry.status : 'active'} /></td>
-                      <td><div className="row-actions"><button title="Edit item" aria-label={`Edit ${'title' in entry ? entry.title : 'item'}`} onClick={() => beginEdit(entry)}><Pencil size={15} strokeWidth={1.5} /></button><button className="delete-action" title="Delete item" aria-label={`Delete ${'title' in entry ? entry.title : 'item'}`} onClick={() => void removeEntry(entry)}><Trash2 size={15} strokeWidth={1.5} /></button></div></td>
+                      <td><div className="row-actions"><button title="Edit item" aria-label={`Edit ${'title' in entry ? entry.title : 'name' in entry ? entry.name : 'item'}`} onClick={() => beginEdit(entry)}><Pencil size={15} strokeWidth={1.5} /></button><button className="delete-action" title="Delete item" aria-label={`Delete ${'title' in entry ? entry.title : 'name' in entry ? entry.name : 'item'}`} onClick={() => void removeEntry(entry)}><Trash2 size={15} strokeWidth={1.5} /></button></div></td>
                     </tr>
                   ))}
             </tbody>
@@ -627,7 +654,7 @@ function CollectionManager({ client, collection }: { client: Client; collection:
       {creating && (
         <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setCreating(false) }}>
           <section className="editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-heading">
-            <header className="modal-header"><div><span className="admin-kicker">{editing ? 'UPDATE CONTENT' : 'NEW CONTENT'}</span><h2 id="editor-heading">{editing ? 'Edit' : 'Add'} {collection === 'articles' ? 'article' : collection === 'programs' ? 'program' : 'service'}</h2></div><button type="button" aria-label="Close editor" onClick={() => setCreating(false)}><X size={20} strokeWidth={1.5} /></button></header>
+            <header className="modal-header"><div><span className="admin-kicker">{editing ? 'UPDATE CONTENT' : 'NEW CONTENT'}</span><h2 id="editor-heading">{editing ? 'Edit' : 'Add'} {collection === 'articles' ? 'article' : collection === 'programs' ? 'program' : collection === 'clients' ? 'client' : 'service'}</h2></div><button type="button" aria-label="Close editor" onClick={() => setCreating(false)}><X size={20} strokeWidth={1.5} /></button></header>
             <form className="admin-form editor-form" onSubmit={save}>
               <div className="editor-fields">
                 {info.fields.map((field) => (
@@ -647,20 +674,20 @@ function CollectionManager({ client, collection }: { client: Client; collection:
                     {field.help && <small>{field.help}</small>}
                   </label>
                 ))}
-                {collection === 'articles' && (
+                {(collection === 'articles' || collection === 'clients') && (
                   <div className="upload-area-wrap field-wide">
-                    <span className="upload-label">Cover image</span>
+                    <span className="upload-label">{collection === 'clients' ? 'Client logo' : 'Cover image'}</span>
                     <label className={dragging ? 'upload-dropzone is-dragging' : 'upload-dropzone'}
                       onDragOver={(event) => { event.preventDefault(); setDragging(true) }}
                       onDragLeave={() => setDragging(false)}
                       onDrop={(event) => { event.preventDefault(); setDragging(false); const file = event.dataTransfer.files[0]; if (file) void uploadImage(file) }}
                     >
                       <input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadImage(file) }} />
-                      {uploading ? <LoaderCircle className="spin" size={22} strokeWidth={1.5} /> : form.image_url ? <Image size={22} strokeWidth={1.5} /> : <UploadCloud size={22} strokeWidth={1.5} />}
-                      <b>{uploading ? 'Uploading image…' : form.image_url ? 'Image attached' : 'Drop an image here or browse'}</b>
+                      {uploading ? <LoaderCircle className="spin" size={22} strokeWidth={1.5} /> : (collection === 'clients' ? form.logo_url : form.image_url) ? <Image size={22} strokeWidth={1.5} /> : <UploadCloud size={22} strokeWidth={1.5} />}
+                      <b>{uploading ? 'Uploading image…' : (collection === 'clients' ? form.logo_url : form.image_url) ? 'Image attached' : 'Drop an image here or browse'}</b>
                       <span>JPG, PNG, GIF or WebP · Max 5 MB</span>
                     </label>
-                    {form.image_url && <div className="image-preview"><img src={form.image_url} alt="Article cover preview" /><button type="button" onClick={() => setForm((current) => ({ ...current, image_url: '' }))}>Remove image <X size={13} strokeWidth={1.5} /></button></div>}
+                    {(collection === 'clients' ? form.logo_url : form.image_url) && <div className="image-preview"><img src={collection === 'clients' ? form.logo_url : form.image_url} alt={collection === 'clients' ? 'Client logo preview' : 'Article cover preview'} /><button type="button" onClick={() => setForm((current) => ({ ...current, [collection === 'clients' ? 'logo_url' : 'image_url']: '' }))}>Remove image <X size={13} strokeWidth={1.5} /></button></div>}
                     <small>Uploaded files use the public “consulting-assets” storage bucket.</small>
                   </div>
                 )}
@@ -675,6 +702,11 @@ function CollectionManager({ client, collection }: { client: Client; collection:
 }
 
 async function getEntries(client: Client, collection: Collection): Promise<CollectionEntry[]> {
+  if (collection === 'clients') {
+    const { data, error } = await client.from('clients').select('*').order('sort_order')
+    if (error) throw error
+    return data ?? []
+  }
   if (collection === 'services') {
     const { data, error } = await client.from('services').select('*').order('sort_order')
     if (error) throw error
@@ -691,6 +723,18 @@ async function getEntries(client: Client, collection: Collection): Promise<Colle
 }
 
 async function saveEntry(client: Client, collection: Collection, form: FormValues, id?: string) {
+  if (collection === 'clients') {
+    const values = {
+      name: form.name.trim(),
+      logo_url: form.logo_url.trim(),
+      sort_order: Number(form.sort_order),
+    }
+    const { error } = id
+      ? await client.from('clients').update(values).eq('id', id)
+      : await client.from('clients').insert(values)
+    if (error) throw error
+    return
+  }
   if (collection === 'services') {
     const values = {
       title: form.title.trim(),
@@ -738,6 +782,8 @@ async function saveEntry(client: Client, collection: Collection, form: FormValue
 async function deleteEntry(client: Client, collection: Collection, id: string) {
   const result = collection === 'services'
     ? await client.from('services').delete().eq('id', id)
+    : collection === 'clients'
+      ? await client.from('clients').delete().eq('id', id)
     : collection === 'programs'
       ? await client.from('programs').delete().eq('id', id)
       : await client.from('articles').delete().eq('id', id)
@@ -869,7 +915,8 @@ function SiteSettingsPage({ client }: { client: Client }) {
       {loading ? <div className="admin-panel settings-loading"><LoaderCircle size={18} className="spin" strokeWidth={1.5} /> Loading website settings…</div> : (
         <form className="settings-form admin-panel" onSubmit={saveSettings}>
           <section className="settings-group"><div><h2>Homepage copy</h2><p>Update key messages shown on the homepage.</p></div><div className="settings-fields">
-            <label className="field-wide">Hero headline<span className="field-hint">Separate the emphasized text with a | character.</span><input required value={form.hero_headline} onChange={(event) => updateField('hero_headline', event.target.value)} /></label>
+            <label className="field-wide">Hero headline<input required value={form.hero_headline} onChange={(event) => updateField('hero_headline', event.target.value)} /></label>
+            <label className="field-wide">Hero subheadline<textarea rows={3} required value={form.hero_subheadline} onChange={(event) => updateField('hero_subheadline', event.target.value)} /></label>
             <label className="field-wide">About text<textarea rows={5} required value={form.about_text} onChange={(event) => updateField('about_text', event.target.value)} /></label>
             <label className="field-wide">Footer copy<textarea rows={3} required value={form.footer_copy} onChange={(event) => updateField('footer_copy', event.target.value)} /></label>
           </div></section>
@@ -885,9 +932,170 @@ function SiteSettingsPage({ client }: { client: Client }) {
   )
 }
 
+function SiteImagesPage({ client }: { client: Client }) {
+  const [images, setImages] = useState<PageImage[]>([])
+  const [section, setSection] = useState<ImageSection>('hero')
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [dragging, setDragging] = useState(false)
+  const [error, setError] = useState('')
+  const [toast, setToast] = useState<ToastMessage | null>(null)
+
+  const loadImages = useCallback(async () => {
+    try {
+      const { data, error: loadError } = await client.from('page_images').select('*').order('sort_order')
+      if (loadError) throw loadError
+      setImages(data ?? [])
+    } catch (loadError) {
+      setError(messageFromError(loadError))
+    } finally {
+      setLoading(false)
+    }
+  }, [client])
+
+  useEffect(() => {
+    let active = true
+    void Promise.resolve().then(() => { if (active) void loadImages() })
+    return () => { active = false }
+  }, [loadImages])
+
+  function showToast(message: string, type: ToastMessage['type']) {
+    setToast({ message, type })
+    window.setTimeout(() => setToast(null), 4200)
+  }
+
+  async function uploadFiles(fileList: FileList | null) {
+    const files = Array.from(fileList ?? [])
+    if (files.length === 0) return
+    const invalidFile = files.find((file) => !file.type.startsWith('image/') || file.size > 5 * 1024 * 1024)
+    if (invalidFile) {
+      showToast(
+        invalidFile.type.startsWith('image/')
+          ? `${invalidFile.name} is larger than 5 MB.`
+          : `${invalidFile.name} is not an image file.`,
+        'error',
+      )
+      return
+    }
+
+    setUploading(true)
+    try {
+      let nextOrder = Math.max(0, ...images.filter((image) => image.section === section).map((image) => image.sort_order))
+      for (const file of files) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
+        const objectPath = `site-images/${section}/${Date.now()}-${crypto.randomUUID()}-${safeName}`
+        const { error: uploadError } = await client.storage
+          .from('consulting-assets')
+          .upload(objectPath, file, { cacheControl: '3600', upsert: false })
+        if (uploadError) throw uploadError
+        const { data } = client.storage.from('consulting-assets').getPublicUrl(objectPath)
+        const altText = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ')
+        const { error: insertError } = await client.from('page_images').insert({
+          section,
+          image_url: data.publicUrl,
+          alt_text: altText,
+          sort_order: ++nextOrder,
+        })
+        if (insertError) throw insertError
+      }
+      showToast(`${files.length} image${files.length === 1 ? '' : 's'} uploaded.`, 'success')
+      setError('')
+    } catch (uploadError) {
+      showToast(messageFromError(uploadError), 'error')
+    } finally {
+      await loadImages()
+      setUploading(false)
+    }
+  }
+
+  async function removeImage(image: PageImage) {
+    if (!window.confirm('Remove this image from the website?')) return
+    try {
+      const { error: deleteError } = await client.from('page_images').delete().eq('id', image.id)
+      if (deleteError) throw deleteError
+      showToast('Image removed from the website.', 'success')
+      await loadImages()
+    } catch (deleteError) {
+      showToast(messageFromError(deleteError), 'error')
+    }
+  }
+
+  const sectionLabels: Record<ImageSection, string> = {
+    hero: 'Hero slideshow',
+    services: 'Services cards',
+    about: 'About page',
+  }
+  const visibleImages = images.filter((image) => image.section === section)
+
+  return (
+    <div className="site-images-page">
+      <PageIntro eyebrow="WEBSITE CONTENT" title="Site Images" description="Upload and manage imagery used by the hero slideshow, services cards, and About page." />
+      {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      {error && <InlineNotice message={error} onRetry={() => { setLoading(true); setError(''); void loadImages() }} />}
+      <section className="admin-panel site-images-panel">
+        <div className="site-image-tabs" role="tablist" aria-label="Image section">
+          {(Object.keys(sectionLabels) as ImageSection[]).map((imageSection) => (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={section === imageSection}
+              className={section === imageSection ? 'site-image-tab is-active' : 'site-image-tab'}
+              key={imageSection}
+              onClick={() => setSection(imageSection)}
+            >
+              {sectionLabels[imageSection]}
+            </button>
+          ))}
+        </div>
+        <div className="site-image-upload">
+          <label
+            className={dragging ? 'upload-dropzone is-dragging' : 'upload-dropzone'}
+            onDragOver={(event) => { event.preventDefault(); setDragging(true) }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(event) => { event.preventDefault(); setDragging(false); void uploadFiles(event.dataTransfer.files) }}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={uploading}
+              onChange={(event) => { void uploadFiles(event.currentTarget.files); event.currentTarget.value = '' }}
+            />
+            {uploading ? <LoaderCircle className="spin" size={22} strokeWidth={1.5} /> : <UploadCloud size={22} strokeWidth={1.5} />}
+            <b>{uploading ? 'Uploading images…' : `Add images for ${sectionLabels[section].toLowerCase()}`}</b>
+            <span>Choose or drop multiple JPG, PNG, GIF or WebP images · Max 5 MB each</span>
+          </label>
+          <p>Hero images rotate in the slideshow. Services images are assigned to service cards in display order. The first About image is used on the About section.</p>
+        </div>
+        <div className="site-image-list-header">
+          <b>{sectionLabels[section]}</b>
+          <span>{loading ? 'Loading…' : `${visibleImages.length} ${visibleImages.length === 1 ? 'image' : 'images'}`}</span>
+        </div>
+        {loading ? (
+          <div className="settings-loading"><LoaderCircle size={18} className="spin" strokeWidth={1.5} /> Loading site images…</div>
+        ) : visibleImages.length === 0 ? (
+          <div className="site-images-empty">No uploaded images in this section. The website will use its built-in default images.</div>
+        ) : (
+          <div className="site-images-grid">
+            {visibleImages.map((image) => (
+              <article className="site-image-card" key={image.id}>
+                <img src={image.image_url} alt={image.alt_text} />
+                <div><b>{image.alt_text || sectionLabels[section]}</b><span>Display order {image.sort_order}</span></div>
+                <button type="button" className="delete-action" aria-label={`Remove ${image.alt_text || 'site image'}`} onClick={() => void removeImage(image)}><Trash2 size={15} strokeWidth={1.5} /></button>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  )
+}
+
 function getEntryField(entry: CollectionEntry, name: string) {
   if (name === 'id') return entry.id
   if (name === 'title' && 'title' in entry) return entry.title
+  if (name === 'name' && 'name' in entry) return entry.name
+  if (name === 'logo_url' && 'logo_url' in entry) return entry.logo_url
   if (name === 'description' && 'description' in entry) return entry.description
   if (name === 'active' && 'active' in entry) return entry.active
   if (name === 'sort_order' && 'sort_order' in entry) return entry.sort_order

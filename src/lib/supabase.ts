@@ -26,9 +26,26 @@ export type Program = {
   sort_order: number
 }
 
+export type ClientRecord = {
+  id: string
+  name: string
+  logo_url: string
+  sort_order: number
+}
+
+export type PageImage = {
+  id: string
+  section: 'hero' | 'services' | 'about'
+  image_url: string
+  alt_text: string
+  sort_order: number
+  created_at: string
+}
+
 export type SiteSettings = {
   id: string
   hero_headline: string
+  hero_subheadline: string
   about_text: string
   footer_copy: string
   phone: string
@@ -52,6 +69,8 @@ export type Database = {
     Tables: {
       services: Table<Service, Omit<Service, 'id'> & { id?: string }>
       programs: Table<Program, Omit<Program, 'id'> & { id?: string }>
+      clients: Table<ClientRecord, Omit<ClientRecord, 'id'> & { id?: string }>
+      page_images: Table<PageImage, Omit<PageImage, 'id' | 'created_at'> & { id?: string; created_at?: string }>
       articles: Table<
         Article,
         {

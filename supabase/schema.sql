@@ -41,11 +41,31 @@ create table if not exists public.enquiries (
 create table if not exists public.site_settings (
   id text primary key check (id = 'primary'),
   hero_headline text not null,
+  hero_subheadline text not null default 'Human Resources Management, Business Development Services, ICT solutions and computer sales for people and organizations ready to move forward.',
   about_text text not null,
   footer_copy text not null,
   phone text not null,
   email text not null,
   address text not null
+);
+
+alter table public.site_settings
+  add column if not exists hero_subheadline text not null default 'Human Resources Management, Business Development Services, ICT solutions and computer sales for people and organizations ready to move forward.';
+
+create table if not exists public.clients (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  logo_url text not null default '',
+  sort_order integer not null default 0
+);
+
+create table if not exists public.page_images (
+  id uuid primary key default gen_random_uuid(),
+  section text not null check (section in ('hero', 'services', 'about')),
+  image_url text not null,
+  alt_text text not null default '',
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists public.newsletter_subscribers (
@@ -54,9 +74,9 @@ create table if not exists public.newsletter_subscribers (
   created_at timestamptz not null default now()
 );
 
-grant select on public.services, public.programs, public.articles, public.site_settings to anon, authenticated;
+grant select on public.services, public.programs, public.articles, public.site_settings, public.clients, public.page_images to anon, authenticated;
 grant insert on public.enquiries, public.newsletter_subscribers to anon, authenticated;
-grant all on public.services, public.programs, public.articles, public.enquiries, public.site_settings, public.newsletter_subscribers to authenticated;
+grant all on public.services, public.programs, public.articles, public.enquiries, public.site_settings, public.newsletter_subscribers, public.clients, public.page_images to authenticated;
 
 alter table public.services enable row level security;
 alter table public.programs enable row level security;
@@ -64,6 +84,8 @@ alter table public.articles enable row level security;
 alter table public.enquiries enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.newsletter_subscribers enable row level security;
+alter table public.clients enable row level security;
+alter table public.page_images enable row level security;
 
 drop policy if exists "Public can read active services" on public.services;
 create policy "Public can read active services"
@@ -115,6 +137,26 @@ create policy "Admins manage site settings"
   using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
   with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
+drop policy if exists "Public can read clients" on public.clients;
+create policy "Public can read clients"
+  on public.clients for select to anon, authenticated
+  using (true);
+drop policy if exists "Admins manage clients" on public.clients;
+create policy "Admins manage clients"
+  on public.clients for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+drop policy if exists "Public can read page images" on public.page_images;
+create policy "Public can read page images"
+  on public.page_images for select to anon, authenticated
+  using (true);
+drop policy if exists "Admins manage page images" on public.page_images;
+create policy "Admins manage page images"
+  on public.page_images for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
 drop policy if exists "Public can subscribe to newsletter" on public.newsletter_subscribers;
 create policy "Public can subscribe to newsletter"
   on public.newsletter_subscribers for insert to anon, authenticated
@@ -143,14 +185,31 @@ on conflict do nothing;
 insert into public.site_settings (id, hero_headline, about_text, footer_copy, phone, email, address)
 values (
   'primary',
-  'Building stronger|businesses. Empowering people.',
+  'Building strong businesses. Empowering employer and employee.',
   'Kholo Tsebong Consulting brings business development, human resources and technology services together in one place. Our focus is on practical solutions that help individuals, teams and organisations build capability.',
   'Corporate training, human resources, ICT services and computer sales for people and organisations in Lesotho.',
   '+266 6345 0591',
   'info@kholotsebong.co.ls',
   'Maseru, Lesotho'
 )
-on conflict (id) do nothing;
+on conflict (id) do update
+set hero_headline = excluded.hero_headline,
+    hero_subheadline = 'Human Resources Management, Business Development Services, ICT solutions and computer sales for people and organizations ready to move forward.';
+
+insert into public.clients (name, logo_url, sort_order)
+select defaults.name, defaults.logo_url, defaults.sort_order
+from (values
+  ('Ministry of Communications', '', 1),
+  ('ASEC Lesotho', '', 2),
+  ('Leaps and Bounces', '', 3),
+  ('Agno', '', 4),
+  ('Tebellong Hospital', '', 5),
+  ('Black Hair Studio', '', 6),
+  ('Roman Catholic Church Lesotho', '', 7)
+) as defaults(name, logo_url, sort_order)
+where not exists (
+  select 1 from public.clients existing where existing.name = defaults.name
+);
 
 insert into storage.buckets (id, name, public)
 values ('consulting-assets', 'consulting-assets', true)
